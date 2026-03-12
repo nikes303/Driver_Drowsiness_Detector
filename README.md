@@ -226,9 +226,11 @@ EAR = (Distance between upper and lower eyelid) / (Width of eye)
 - Reduce `EYE_AR_CONSEC_FRAMES` value
 - Check lighting conditions
 
-### MediaPipe Not Detected
-```bash
-pip install --upgrade mediapipe
+
+### Mediapipe error fix
+```
+pip uninstall mediapipe
+pip install mediapipe==0.10.9
 ```
 
 ### Camera Freezing
@@ -278,10 +280,6 @@ pip install --upgrade mediapipe
 - Mobile application integration
 - Driver profile customization
 - Advanced gaze tracking
-
-## License
-
-[Specify your license here, e.g., MIT, Apache 2.0, etc.]
 
 ## Contributing
 
