@@ -6,14 +6,19 @@ import pygame
 import mediapipe as mp
 from datetime import datetime
 import config
-from utils import play_alarm, log_drowsiness_event, resize_frame
+from utils import play_alarm, log_drowsiness_event, resize_frame, is_looking_away
+
 mp_face_mesh = mp.solutions.face_mesh
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
+left_eye_landmarks = None
+right_eye_landmarks = None
+
 LEFT_EYE_INDICES = [
     362, 382, 381, 380, 374, 373, 390, 249,
     263, 466, 388, 387, 386, 385, 384, 398
 ]
+
 RIGHT_EYE_INDICES = [
     33, 7, 163, 144, 145, 153, 154, 155,
     133, 173, 157, 158, 159, 160, 161, 246
@@ -49,8 +54,11 @@ def calculate_ear(eye_landmarks):
     if eye_width > 0:
         return eye_height / eye_width
     return 0.0
+
+
 def extract_eye_landmarks(face_landmarks, eye_indices):
     return [face_landmarks.landmark[idx] for idx in eye_indices]
+
 def main():
     args = parse_arguments()
     if args.log:
@@ -90,6 +98,9 @@ def main():
     print("[INFO] Press 'd' to toggle debug mode")
     print("[INFO] Press 'r' to reset counters")
     debug_mode = args.debug
+    
+
+    
     while True:
         ret, frame = vs.read()
         if not ret:
@@ -170,6 +181,22 @@ def main():
         if debug_mode:
             cv2.imshow("Debug View", debug_frame)
         key = cv2.waitKey(1) & 0xFF
+        
+        success, frame = vs.read()
+        if not success: break
+        # Convert BGR to RGB for MediaPipe
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = face_mesh.process(rgb_frame)
+        h, w, _ = frame.shape
+        status = "Looking at Camera"
+        if results.multi_face_landmarks:
+            for face_landmarks in results.multi_face_landmarks:
+                # INVOKE THE FUNCTION HERE
+                if is_looking_away(face_landmarks, w, h):
+                    status = "Looking Away!"
+        cv2.putText(frame, status, (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv2.imshow('Head Pose Detection', frame)
+                
         if key == ord("q"):
             break
         elif key == ord("d"):
@@ -183,5 +210,7 @@ def main():
     vs.release()
     cv2.destroyAllWindows()
     print("[INFO] Sleep detection system stopped")
+    
+    
 if __name__ == "__main__":
     main()
