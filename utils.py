@@ -6,6 +6,12 @@ import time
 import logging
 from datetime import datetime
 import os
+import mediapipe as mp
+
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+
+
 def initialize_logger(log_file):
     logging.basicConfig(
         filename=log_file,
@@ -13,6 +19,8 @@ def initialize_logger(log_file):
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
     logging.info("driver_drowsiness session started")
+    
+    
 def play_alarm(sound_file=None, volume=1.0):
     try:
         if not pygame.mixer.get_init():
@@ -40,6 +48,8 @@ def play_alarm(sound_file=None, volume=1.0):
     except Exception as e:
         print(f"[ERROR] Failed to play alarm: {e}")
         print("\a" * 3)  
+        
+        
 def calculate_eye_aspect_ratio(eye1, eye2):
     x1, y1, w1, h1 = eye1
     x2, y2, w2, h2 = eye2
@@ -52,6 +62,10 @@ def calculate_eye_aspect_ratio(eye1, eye2):
     size_factor = min(0.03, (area1 + area2) / 20000)
     ear += size_factor
     return min(max(ear, 0.15), 0.35)
+
+
+
+
 def is_looking_away(eyes, frame_height, frame_width):
     if len(eyes) < 2:
         return False
@@ -68,6 +82,9 @@ def is_looking_away(eyes, frame_height, frame_width):
         if cy < frame_height * 0.15 or cy > frame_height * 0.6:
             return True
     return False
+
+
+
 def detect_eye_closure(eye_roi_gray):
     eye_roi_eq = cv2.equalizeHist(eye_roi_gray)
     hist = cv2.calcHist([eye_roi_eq], [0], None, [256], [0, 256])
@@ -75,6 +92,8 @@ def detect_eye_closure(eye_roi_gray):
     weights = np.linspace(1.0, 0.1, 256)  
     closure_score = np.sum(hist.flatten() * weights)
     return closure_score
+
+
 def log_drowsiness_event(log_file):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
@@ -83,5 +102,7 @@ def log_drowsiness_event(log_file):
         logging.info("Drowsiness event logged")
     except Exception as e:
         print(f"[ERROR] Failed to log drowsiness event: {e}")
+        
+        
 def resize_frame(frame, width, height):
     return cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
