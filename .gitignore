@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
 
 # C extensions
 *.so
@@ -46,34 +47,51 @@ coverage.xml
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# pyenv
-.python-version
-
 # Environment
 .env
+.python-version
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+drowsy_env/
 
 # Project specific
 *.log
 log/
 logs/
-*.wav
-alarm.wav
 cascades/
+runs/
 
 # Media files
 videos/
 *.mp4
 *.avi
 *.mov
+# Ignore all audio files to save space...
+*.wav
+# ...BUT explicitly allow the main alarm to upload for the team!
+!alarm.wav 
 
 # IDE files
 .idea/
 .vscode/
 *.swp
 *.swo
+
+features/drink_and_drive/drink_dataset/
+drink_detection_logs/
+features/drink_and_drive/runs/
+dataset.yaml
+features/drink_and_drive/image_downloader.log
+features/drink_and_drive/yolov8n.pt
+models/
+features/drink_and_drive/runs/
+features/drink_and_drive/drink_detection_logs/
+features/drink_and_drive/DRINK_DETECTION_GUIDE.md
+features/drink_and_drive/IMAGE_DOWNLOADER_GUIDE.md
+features/drink_and_drive/IMPLEMENTATION_SUMMARY.md
+features/drink_and_drive/YOLOV8_MIGRATION.md
+features/drink_and_drive/quickstart.py
